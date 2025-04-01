@@ -1,6 +1,23 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@code {
+    private Dictionary<string, bool> expandedSections = new()
+    {
+        {"Hjemmet", true},
+        {"Enterprise", false},
+        {"SMV", false}
+    };
+
+    private void ToggleSection(string sectionName)
+    {
+        if (expandedSections.ContainsKey(sectionName))
+        {
+            expandedSections[sectionName] = !expandedSections[sectionName];
+        }
+    }
+}
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
-        <a class="navbar-brand" href="">Blazor</a>
+        <a class="navbar-brand" href="">GF2</a>
     </div>
 </div>
 
@@ -8,35 +25,88 @@
 
 <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
     <nav class="nav flex-column">
+        <!-- Forside -->
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Forside
             </NavLink>
         </div>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="four-in-a-row">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Four in a row
-            </NavLink>
+        <!-- Hjemmet Section -->
+        <div class="nav-group">
+            <div class="nav-group-header px-3" @onclick="@(() => ToggleSection("Hjemmet"))">
+                <span class="bi bi-house-fill" aria-hidden="true"></span> Hjemmet
+                <span class="bi @(expandedSections["Hjemmet"] ? "bi-chevron-down" : "bi-chevron-right") ms-auto"></span>
+            </div>
+            @if (expandedSections["Hjemmet"])
+            {
+                <div class="nav-group-items">
+                    <div class="nav-item px-4">
+                        <NavLink class="nav-link" href="hjemmet">
+                            <span class="bi bi-grid-fill" aria-hidden="true"></span> Oversigt
+                        </NavLink>
+                    </div>
+                    <div class="nav-item px-4">
+                        <NavLink class="nav-link" href="tic-tac-toe">
+                            <span class="bi bi-grid-3x3" aria-hidden="true"></span> Tic Tac Toe
+                        </NavLink>
+                    </div>
+                    <div class="nav-item px-4">
+                        <NavLink class="nav-link" href="four-in-a-row">
+                            <span class="bi bi-circle-fill" aria-hidden="true"></span> Four in a Row
+                        </NavLink>
+                    </div>
+                    <div class="nav-item px-4">
+                        <NavLink class="nav-link" href="type-racer">
+                            <span class="bi bi-keyboard" aria-hidden="true"></span> Type Racer
+                        </NavLink>
+                    </div>
+                    <div class="nav-item px-4">
+                        <NavLink class="nav-link" href="wordle">
+                            <span class="bi bi-fonts" aria-hidden="true"></span> Wordle
+                        </NavLink>
+                    </div>
+                </div>
+            }
         </div>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="tic-tac-toe">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Tic Tac Toe
-            </NavLink>
+        <!-- SMV Section -->
+        <div class="nav-group">
+            <div class="nav-group-header px-3" @onclick="@(() => ToggleSection("SMV"))">
+                <span class="bi bi-briefcase" aria-hidden="true"></span> SMV
+                <span class="bi @(expandedSections["SMV"] ? "bi-chevron-down" : "bi-chevron-right") ms-auto"></span>
+            </div>
+            @if (expandedSections["SMV"])
+            {
+                <div class="nav-group-items">
+                    <div class="nav-item px-4">
+                        <NavLink class="nav-link" href="smv">
+                            <span class="bi bi-grid-fill" aria-hidden="true"></span> Oversigt
+                        </NavLink>
+                    </div>
+                </div>
+            }
         </div>
+
+        <!-- Enterprise Section -->
+        <div class="nav-group">
+            <div class="nav-group-header px-3" @onclick="@(() => ToggleSection("Enterprise"))">
+                <span class="bi bi-building" aria-hidden="true"></span> Enterprise
+                <span class="bi @(expandedSections["Enterprise"] ? "bi-chevron-down" : "bi-chevron-right") ms-auto"></span>
+            </div>
+            @if (expandedSections["Enterprise"])
+            {
+                <div class="nav-group-items">
+                    <div class="nav-item px-4">
+                        <NavLink class="nav-link" href="enterprice">
+                            <span class="bi bi-grid-fill" aria-hidden="true"></span> Oversigt
+                        </NavLink>
+                    </div>
+                </div>
+            }
+        </div>
+
         
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="type-racer">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Type Racer
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="wordle">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Wordle
-            </NavLink>
-        </div>
     </nav>
 </div>
 

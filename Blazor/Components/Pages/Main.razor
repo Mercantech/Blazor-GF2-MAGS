@@ -1,0 +1,94 @@
+@page "/"
+
+<PageTitle>GF2 Projektoversigt</PageTitle>
+
+<div class="container mt-4">
+    <div class="text-center mb-5">
+        <h1 class="display-4">Velkommen til GF2</h1>
+        <p class="lead">Udforsk dine tre spændende projekter gennem forløbet</p>
+    </div>
+
+    <div class="row g-4">
+        <!-- Hjemmet Projekt -->
+        <div class="col-md-4">
+            <div class="card h-100 project-card">
+                <div class="card-body">
+                    <h3 class="card-title">🏠 Hjemmet</h3>
+                    <p class="card-text">
+                        Dyk ned i spilprogrammering og udvikl forskellige spil såsom:
+                        Tic Tac Toe, Four in a Row, Type Racer og Wordle.
+                    </p>
+                    <a href="/hjemmet" class="btn btn-primary mt-auto">Start Projekt</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- SMV Projekt -->
+        <div class="col-md-4">
+            <div class="card h-100 project-card">
+                <div class="card-body">
+                    <h3 class="card-title">💼 SMV</h3>
+                    <p class="card-text">
+                        Arbejd med løsninger til små og mellemstore virksomheder
+                        og få praktisk erfaring med erhvervsudvikling.
+                    </p>
+                    <a href="/smv" class="btn btn-primary mt-auto">Start Projekt</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enterprise Projekt -->
+        <div class="col-md-4">
+            <div class="card h-100 project-card">
+                <div class="card-body">
+                    <h3 class="card-title">🏢 Enterprise</h3>
+                    <p class="card-text">
+                        Udforsk enterprise-udvikling og lær at bygge
+                        professionelle forretningsløsninger.
+                    </p>
+                    <a href="/enterprice" class="btn btn-primary mt-auto">Start Projekt</a>
+                </div>
+            </div>
+        </div>
+
+        
+    </div>
+</div>
+
+<style>
+    .project-card {
+        transition: transform 0.2s ease-in-out;
+        border: none;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .project-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .card-title {
+        color: #2c3e50;
+        margin-bottom: 1rem;
+    }
+
+    .btn-primary {
+        background-color: #3498db;
+        border: none;
+        padding: 0.5rem 1.5rem;
+    }
+
+    .btn-primary:hover {
+        background-color: #2980b9;
+    }
+
+    .display-4 {
+        color: #2c3e50;
+        font-weight: 600;
+    }
+
+    .lead {
+        color: #7f8c8d;
+    }
+</style>
+
+
