@@ -9,8 +9,10 @@ namespace Blazor
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-            builder.Services.AddRazorComponents()
-                .AddInteractiveServerComponents();
+            builder.Services.AddRazorComponents().AddInteractiveServerComponents();
+            builder.Services.AddRazorPages();
+            builder.Services.AddServerSideBlazor();
+            builder.Services.AddHttpClient();
 
             var app = builder.Build();
 
@@ -27,8 +29,7 @@ namespace Blazor
             app.UseAntiforgery();
 
             app.MapStaticAssets();
-            app.MapRazorComponents<App>()
-                .AddInteractiveServerRenderMode();
+            app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 
             app.Run();
         }
