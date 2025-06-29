@@ -1,49 +1,57 @@
 ﻿@page "/hjemmet"
 
-<PageTitle>Velkommen til GF2 Spilprojekt</PageTitle>
+<div class="hjemmet-hero text-center py-5 mb-4">
+    <h1 class="display-3 fw-bold mb-3">Hjemmet</h1>
+    <p class="lead mb-0">Små tidsfordrivsspil til hjemmekontoret</p>
+</div>
 
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-12">
-            <div class="welcome-section">
-                <h1 class="display-4 mb-4">Velkommen til GF2 Spilprojektet! 🎮</h1>
-                <h3><a href="https://mercantec.notion.site/hjemmet?pvs=4" class="text-decoration-none">
-                    <img src="https://gf2.mercantec.tech/Notion.png" alt="Besøg projektets hjemmeside" class="img-fluid" style="max-width: 300px;">
-                </a></h3>
-                
-                <div class="card shadow-sm mb-4">
-                    <div class="card-body">
-                        <h2 class="h4 mb-3">Kære GF2'er</h2>
-                        <p>
-                            Velkommen til vores spilprojekt! Her finder du fire spændende programmeringsopgaver, 
-                            som vil hjælpe dig med at udvikle dine færdigheder inden for webudvikling og C#:
-                        </p>
-                        
-                        <ul class="list-group list-group-flush mt-3">
-                            <li class="list-group-item">
-                                🎯 <a href="tic-tac-toe"><strong>Tic Tac Toe</strong></a> - Klassisk kryds og bolle spil
-                            </li>
-                            <li class="list-group-item">
-                                🔵 <a href="four-in-a-row"><strong>Four in a Row</strong></a> - Strategisk fire på stribe
-                            </li>
-                            <li class="list-group-item">
-                                ⌨️ <a href="type-racer"><strong>Type Racer</strong></a> - Test dine skrivefærdigheder
-                            </li>
-                            <li class="list-group-item">
-                                📝 <a href="wordle"><strong>Wordle</strong></a> - Gæt dagens ord
-                            </li>
-                        </ul>
+<div class="container hjemmet-content">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg mb-5 border-0 hjemmet-card">
+                <div class="card-body p-5">
+                    <h2 class="h3 mb-4 text-primary fw-semibold">Velkommen til Hjemmet</h2>
+                    <p class="mb-4">
+                        Når man arbejder hjemmefra, kan det være rart med en lille pause – og hvad er bedre end at lave jeres egne små spil? Her er tre klassiske spil, I kan bygge direkte i konsollen. I må også meget gerne finde på jeres egne spil!
+                    </p>
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <NavLink class="text-decoration-none" href="/guessanumber">
+                                <div class="feature-box p-4 h-100 rounded-4 bg-light shadow-sm">
+                                    <div class="display-5 mb-2">🎯</div>
+                                    <h4 class="fw-bold mb-2">Gæt et tal</h4>
+                                    <p class="mb-0 small">Computeren vælger et tilfældigt tal mellem 1 og 100. I skal gætte det. Efter hvert gæt får I at vide, om det rigtige tal er højere eller lavere.<br /><em>Ekstra:</em> Gem gættene i en liste og vis dem til sidst.</p>
+                                </div>
+                            </NavLink>
+                        </div>
+                        <div class="col-md-6">
+                            <NavLink class="text-decoration-none" href="/rockpaperscissors">
+                                <div class="feature-box p-4 h-100 rounded-4 bg-light shadow-sm">
+                                    <div class="display-5 mb-2">✊✋✌️</div>
+                                    <h4 class="fw-bold mb-2">Sten, Saks, Papir</h4>
+                                    <p class="mb-0 small">Spil mod computeren. Hver runde vælger både I og computeren sten, saks eller papir. Programmet afgør vinderen og holder styr på point.<br /><em>Ekstra:</em> Mulighed for flere runder og vis samlet score.</p>
+                                </div>
+                            </NavLink>
+                        </div>
+                        <div class="col-md-6">
+                            <NavLink class="text-decoration-none" href="/tic-tac-toe">
+                                <div class="feature-box p-4 h-100 rounded-4 bg-light shadow-sm">
+                                    <div class="display-5 mb-2">❌⭕</div>
+                                    <h4 class="fw-bold mb-2">Tic-Tac-Toe</h4>
+                                    <p class="mb-0 small">To spillere (eller én mod computeren) skiftes til at sætte X og O på et 3x3-bræt.<br /><em>Ekstra:</em> Gem brættet i et array/liste og lav metode til at tjekke vinder.</p>
+                                </div>
+                            </NavLink>
+                        </div>
+                        <div class="col-md-6">
+                            <NavLink class="text-decoration-none" href="/hjemmet">
+                                <div class="feature-box p-4 h-100 rounded-4 bg-light shadow-sm">
+                                    <div class="display-5 mb-2">💡</div>
+                                    <h4 class="fw-bold mb-2">Find på jeres eget spil!</h4>
+                                    <p class="mb-0 small">Det kunne være en quiz, et regnespil eller noget helt tredje. Husk at bruge de værktøjer, I har fået i undervisningen!</p>
+                                </div>
+                            </NavLink>
+                        </div>
                     </div>
-                </div>
-
-                <div class="alert alert-info">
-                    <h3 class="h5">Sådan kommer du i gang:</h3>
-                    <ol class="mb-0">
-                        <li>Vælg et projekt fra menuen til venstre</li>
-                        <li>Læs opgavebeskrivelsen grundigt</li>
-                        <li>Start med at planlægge din løsning</li>
-                        <li>God fornøjelse med kodningen!</li>
-                    </ol>
                 </div>
             </div>
         </div>
@@ -51,37 +59,24 @@
 </div>
 
 <style>
-    .welcome-section {
-        max-width: 800px;
-        margin: 0 auto;
-    }
-
-    .card {
-        border-radius: 10px;
-        border: none;
-    }
-
-    .list-group-item {
-        border-left: none;
-        border-right: none;
-        padding: 1rem;
-    }
-
-    .alert {
-        border-radius: 10px;
-    }
-
-    h1 {
-        color: #2c3e50;
-    }
-
-    .display-4 {
-        font-size: 2.5rem;
-    }
-
-    @@media (max-width: 768px) {
-        .display-4 {
-            font-size: 2rem;
-        }
-    }
+.hjemmet-hero {
+    background: linear-gradient(90deg, #1b6ec2 0%, #3a0647 100%);
+    color: #fff;
+    border-radius: 0 0 2rem 2rem;
+    box-shadow: 0 4px 32px rgba(27,110,194,0.10);
+}
+.hjemmet-content {
+    margin-top: -40px;
+}
+.hjemmet-card {
+    border-radius: 1.5rem;
+}
+.feature-box {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.feature-box:hover {
+    transform: translateY(-6px) scale(1.03);
+    box-shadow: 0 8px 32px rgba(27,110,194,0.10);
+    background: #eaf1fb;
+}
 </style>
