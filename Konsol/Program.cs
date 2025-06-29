@@ -1,4 +1,5 @@
 ﻿using System;
+
 bool run = true;
 while (run)
 {
@@ -9,23 +10,28 @@ while (run)
     {
         case "1":
             // Kald GuessANumber
-            Hjemmet.GuessANumber.Start();
+            var guessANumber = new Hjemmet.GuessANumber();
+            guessANumber.Start();
             break;
         case "2":
             // Kald RockPaperScissors
-            Hjemmet.RockPaperScissors.Start();
+            var rockPaperScissors = new Hjemmet.RockPaperScissors();
+            rockPaperScissors.Start();
             break;
         case "3":
             // Kald TicTacToe
-            Hjemmet.TicTacToe.Start();
+            var ticTacToe = new Hjemmet.TicTacToe();
+            ticTacToe.Start();
             break;
         case "4":
             // Kald BinaryConverter
-            Kontoret.BinaryConverter.Start();
+            var binaryConverter = new Kontoret.BinaryConverter();
+            binaryConverter.Start();
             break;
         case "5":
             // Kald ADService
-            Enterprice.ADService.Start();
+            var adService = new Enterprice.ADService();
+            adService.Start();
             break;
         case "?":
             PrintMenu();
@@ -40,7 +46,8 @@ while (run)
     }
 }
 
-void PrintMenu(){
+void PrintMenu()
+{
     Console.Clear();
     Console.WriteLine("Vælg et program:");
     Console.WriteLine("1. Gæt et tal");
