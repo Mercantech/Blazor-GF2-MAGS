@@ -1,5 +1,8 @@
 @page "/enterprice/timemanagment"
 
+@using System.Globalization
+@inject IJSRuntime JS
+
 <div class="game-hero text-center py-5 mb-4">
     <h1 class="display-4 fw-bold mb-3">Stemple ind/ud-system</h1>
     <p class="lead mb-0">Lav et system hvor brugere kan stemple ind og ud – og hold styr på arbejdstiden!</p>
@@ -10,19 +13,138 @@
         <div class="col-lg-8">
             <div class="card shadow-lg mb-5 border-0 game-card">
                 <div class="card-body p-5">
-                    <h2 class="h4 mb-3 text-primary fw-semibold">Sådan gør du:</h2>
-                    <ul class="list-group list-group-flush mb-4">
-                        <li class="list-group-item">Lav en formular hvor brugeren kan indtaste navn eller ID og stemple ind/ud.</li>
-                        <li class="list-group-item">Gem og vis en oversigt over stemplinger.</li>
-                        <li class="list-group-item"><em>Ekstra:</em> Integrér med AD eller lav ID-kort-simulering.</li>
+                    <h2 class="h4 mb-3 text-primary fw-semibold">Stemple ind/ud</h2>
+                    <EditForm Model="formModel" OnValidSubmit="Stemple">
+                        <div class="row g-2 align-items-end">
+                            <div class="col-md-6">
+                                <InputText class="form-control" @bind-Value="formModel.Navn" placeholder="Navn eller ID" />
+                            </div>
+                            <div class="col-md-3">
+                                <InputSelect class="form-select" @bind-Value="formModel.Ind">
+                                    <option value="true">Stemple ind</option>
+                                    <option value="false">Stemple ud</option>
+                                </InputSelect>
+                            </div>
+                            <div class="col-md-3">
+                                <button class="btn btn-primary w-100" type="submit">Stemple</button>
+                            </div>
+                        </div>
+                        @if (!string.IsNullOrEmpty(fejlbesked))
+                        {
+                            <div class="text-danger mt-2">@fejlbesked</div>
+                        }
+                    </EditForm>
+
+                    <hr class="my-4" />
+
+                    <h5 class="mb-3">Oversigt over stemplinger</h5>
+                    <table class="table table-sm table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Navn</th>
+                                <th>Tidspunkt</th>
+                                <th>Ind/Ud</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var s in stemplinger.OrderByDescending(s => s.Tidspunkt))
+                            {
+                                <tr>
+                                    <td>@s.Navn</td>
+                                    <td>@s.Tidspunkt.ToString("dd-MM-yyyy HH:mm:ss")</td>
+                                    <td>@(s.Ind ? "Ind" : "Ud")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+
+                    <h5 class="mt-4 mb-2">Samlet arbejdstid pr. bruger</h5>
+                    <ul>
+                        @foreach (var navn in UnikkeBrugere)
+                        {
+                            <li><strong>@navn:</strong> @SamletTid(navn).ToString("hh\\:mm\\:ss")</li>
+                        }
                     </ul>
-                    <div class="alert alert-info mt-4">
-                        <strong>Tip:</strong> Prøv at vise samlet arbejdstid for hver bruger!</div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+@* --- STEMPEL SYSTEM START --- *@
+@code {
+    class Stempling
+    {
+        public string Navn { get; set; } = string.Empty;
+        public DateTime Tidspunkt { get; set; }
+        public bool Ind { get; set; } // true = ind, false = ud
+    }
+
+    class StempleModel
+    {
+        public string Navn { get; set; } = string.Empty;
+        public bool Ind { get; set; } = true;
+    }
+
+    private StempleModel formModel = new();
+    private List<Stempling> stemplinger = new();
+    private string fejlbesked = string.Empty;
+    private const string StorageKey = "stemplinger";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var json = await JS.InvokeAsync<string>("localStorage.getItem", StorageKey);
+        if (!string.IsNullOrWhiteSpace(json))
+        {
+            try
+            {
+                stemplinger = System.Text.Json.JsonSerializer.Deserialize<List<Stempling>>(json) ?? new();
+            }
+            catch { stemplinger = new(); }
+        }
+    }
+
+    async Task Stemple()
+    {
+        fejlbesked = string.Empty;
+        if (string.IsNullOrWhiteSpace(formModel.Navn))
+        {
+            fejlbesked = "Indtast navn!";
+            return;
+        }
+        stemplinger.Add(new Stempling
+        {
+            Navn = formModel.Navn.Trim(),
+            Tidspunkt = DateTime.Now,
+            Ind = formModel.Ind
+        });
+        formModel = new();
+        await GemStemplingerAsync();
+    }
+
+    async Task GemStemplingerAsync()
+    {
+        var json = System.Text.Json.JsonSerializer.Serialize(stemplinger);
+        await JS.InvokeVoidAsync("localStorage.setItem", StorageKey, json);
+    }
+
+    IEnumerable<string> UnikkeBrugere => stemplinger.Select(s => s.Navn).Distinct();
+
+    TimeSpan SamletTid(string navn)
+    {
+        var brugerStemplinger = stemplinger.Where(s => s.Navn == navn).OrderBy(s => s.Tidspunkt).ToList();
+        TimeSpan sum = TimeSpan.Zero;
+        for (int i = 0; i < brugerStemplinger.Count - 1; i++)
+        {
+            if (brugerStemplinger[i].Ind && !brugerStemplinger[i + 1].Ind)
+            {
+                sum += brugerStemplinger[i + 1].Tidspunkt - brugerStemplinger[i].Tidspunkt;
+                i++; // spring "ud" over
+            }
+        }
+        return sum;
+    }
+}
 
 <style>
 .game-hero {
@@ -30,6 +152,7 @@
     color: #fff;
     border-radius: 0 0 2rem 2rem;
     box-shadow: 0 4px 32px rgba(27,110,194,0.10);
+    margin-top: -20px;
 }
 .game-content {
     margin-top: -40px;
