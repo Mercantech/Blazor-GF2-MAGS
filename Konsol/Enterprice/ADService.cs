@@ -1,39 +1,61 @@
 using System;
+using System.Collections.Generic;
 using System.DirectoryServices.Protocols;
 using System.IO;
 using System.Net;
+using System.Text;
 using System.Text.Json;
 
-namespace Enterprice
+namespace Konsol.Enterprice
 {
     public class ADService
     {
-        public ADService()
+        private readonly string _server;
+        private readonly string _username;
+        private readonly string _password;
+        private readonly string _domain;
+        private readonly string _adminUsername;
+        private readonly string _adminPassword;
+
+        public ADService(
+            string server,
+            string username,
+            string password,
+            string domain,
+            string adminUsername,
+            string adminPassword
+        )
+        {
+            _server = server;
+            _username = username;
+            _password = password;
+            _domain = domain;
+            _adminUsername = adminUsername;
+            _adminPassword = adminPassword;
+        }
+
+        public static ADService FromConfigFile(string path = "appsettings.json")
         {
             try
             {
-                var config = JsonSerializer.Deserialize<Config>(
-                    File.ReadAllText("appsettings.json")
+                var config = JsonSerializer.Deserialize<Config>(File.ReadAllText(path));
+                if (config?.AD == null || config.ADAdmin == null)
+                    throw new Exception("AD eller ADAdmin konfiguration mangler i filen.");
+                return new ADService(
+                    config.AD.Server,
+                    config.AD.Username,
+                    config.AD.Password,
+                    config.AD.Domain,
+                    config.ADAdmin.Username,
+                    config.ADAdmin.Password
                 );
-                _server = config?.AD?.Server ?? "";
-                _username = config?.AD?.Username ?? "";
-                _password = config?.AD?.Password ?? "";
-                _domain = config?.AD?.Domain ?? "";
-                Console.WriteLine($"Server: {_server}");
-                Console.WriteLine($"Username: {_username}");
-                Console.WriteLine($"Password: {_password}");
-                Console.WriteLine($"Domain: {_domain}");
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Fejl ved indlæsning af konfiguration: {ex.Message}");
+                throw;
             }
         }
-
-        private readonly string? _server;
-        private readonly string? _username;
-        private readonly string? _password;
-        private readonly string? _domain;
 
         public void Start()
         {
@@ -41,11 +63,13 @@ namespace Enterprice
             Console.WriteLine(status);
         }
 
-        public LdapConnection Connect()
+        public LdapConnection Connect(bool useAdmin = false)
         {
             try
             {
-                var credential = new NetworkCredential($"{_username}@{_domain}", _password);
+                var username = useAdmin ? _adminUsername : _username;
+                var password = useAdmin ? _adminPassword : _password;
+                var credential = new NetworkCredential($"{username}@{_domain}", password);
                 var connection = new LdapConnection(_server)
                 {
                     Credential = credential,
@@ -55,7 +79,6 @@ namespace Enterprice
             }
             catch (Exception ex)
             {
-                // Returnér null hvis der opstår fejl
                 Console.WriteLine($"Fejl ved oprettelse af forbindelse: {ex.Message}");
                 return null;
             }
@@ -82,18 +105,86 @@ namespace Enterprice
                 }
             }
         }
+
+        // Hent alle brugere fra AD
+        public List<string> GetAllUsers()
+        {
+            var users = new List<string>();
+            using (var connection = Connect())
+            {
+                if (connection == null)
+                    return users;
+                try
+                {
+                    connection.Bind();
+                    var searchRequest = new SearchRequest(
+                        $"DC={_domain.Replace(".", ",DC=")}",
+                        "(objectClass=user)",
+                        SearchScope.Subtree,
+                        "sAMAccountName",
+                        "displayName",
+                        "mail"
+                    );
+                    var response = (SearchResponse)connection.SendRequest(searchRequest);
+                    foreach (SearchResultEntry entry in response.Entries)
+                    {
+                        var name =
+                            entry.Attributes["displayName"]?.GetValues(typeof(string))[0] as string
+                            ?? "";
+                        var user =
+                            entry.Attributes["sAMAccountName"]?.GetValues(typeof(string))[0]
+                                as string
+                            ?? "";
+                        var mail =
+                            entry.Attributes["mail"]?.GetValues(typeof(string))[0] as string ?? "";
+                        users.Add($"{name} ({user}) - {mail}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Fejl ved hentning af brugere: {ex.Message}");
+                }
+            }
+            return users;
+        }
+
+        // Hent alle grupper fra AD
+        public List<string> GetAllGroups()
+        {
+            var groups = new List<string>();
+            using (var connection = Connect())
+            {
+                if (connection == null)
+                    return groups;
+                try
+                {
+                    connection.Bind();
+                    var searchRequest = new SearchRequest(
+                        $"DC={_domain.Replace(".", ",DC=")}",
+                        "(objectClass=group)",
+                        SearchScope.Subtree,
+                        "cn"
+                    );
+                    var response = (SearchResponse)connection.SendRequest(searchRequest);
+                    foreach (SearchResultEntry entry in response.Entries)
+                    {
+                        var group =
+                            entry.Attributes["cn"]?.GetValues(typeof(string))[0] as string ?? "";
+                        groups.Add(group);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Fejl ved hentning af grupper: {ex.Message}");
+                }
+            }
+            return groups;
+        }
     }
 
-    public class Config
-    {
-        public ADConfig? AD { get; set; }
-    }
+    public record Config(ADConfig AD, ADAdminConfig ADAdmin);
 
-    public class ADConfig
-    {
-        public string? Server { get; set; }
-        public string? Username { get; set; }
-        public string? Password { get; set; }
-        public string? Domain { get; set; }
-    }
+    public record ADConfig(string Server, string Username, string Password, string Domain);
+
+    public record ADAdminConfig(string Username, string Password);
 }

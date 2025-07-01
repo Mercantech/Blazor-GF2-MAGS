@@ -30,7 +30,7 @@ while (run)
             break;
         case "5":
             // Kald ADService
-            var adService = new Enterprice.ADService();
+            var adService = Konsol.Enterprice.ADService.FromConfigFile();
             adService.Start();
             break;
         case "?":

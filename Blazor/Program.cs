@@ -1,4 +1,5 @@
 using Blazor.Components;
+using Konsol.Enterprice;
 
 namespace Blazor
 {
@@ -13,6 +14,7 @@ namespace Blazor
             builder.Services.AddRazorPages();
             builder.Services.AddServerSideBlazor();
             builder.Services.AddHttpClient();
+            builder.Services.AddSingleton(_ => ADService.FromConfigFile("appsettings.json"));
 
             var app = builder.Build();
 
