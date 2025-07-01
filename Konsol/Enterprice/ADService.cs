@@ -180,6 +180,92 @@ namespace Konsol.Enterprice
             }
             return groups;
         }
+
+        public List<string> GetGroupMembers(string groupName)
+        {
+            var members = new List<string>();
+            using (var connection = Connect())
+            {
+                if (connection == null)
+                    return members;
+                try
+                {
+                    connection.Bind();
+                    var searchRequest = new SearchRequest(
+                        $"DC={_domain.Replace(".", ",DC=")}",
+                        $"(&(objectClass=group)(cn={groupName}))",
+                        SearchScope.Subtree,
+                        "member"
+                    );
+                    var response = (SearchResponse)connection.SendRequest(searchRequest);
+                    foreach (SearchResultEntry entry in response.Entries)
+                    {
+                        if (entry.Attributes["member"] != null)
+                        {
+                            foreach (
+                                var member in entry.Attributes["member"].GetValues(typeof(string))
+                            )
+                            {
+                                members.Add(member.ToString());
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Fejl ved hentning af gruppemedlemmer: {ex.Message}");
+                }
+            }
+            return members;
+        }
+
+        public Dictionary<string, List<string>> GetAllGroupsWithMembers()
+        {
+            var result = new Dictionary<string, List<string>>();
+            using (var connection = Connect())
+            {
+                if (connection == null)
+                    return result;
+                try
+                {
+                    connection.Bind();
+                    var searchRequest = new SearchRequest(
+                        $"DC={_domain.Replace(".", ",DC=")}",
+                        "(objectClass=group)",
+                        SearchScope.Subtree,
+                        "cn",
+                        "member"
+                    );
+                    var response = (SearchResponse)connection.SendRequest(searchRequest);
+                    foreach (SearchResultEntry entry in response.Entries)
+                    {
+                        var group =
+                            entry.Attributes["cn"]?.GetValues(typeof(string))[0] as string ?? "";
+                        var members = new List<string>();
+                        if (entry.Attributes["member"] != null)
+                        {
+                            foreach (
+                                var member in entry.Attributes["member"].GetValues(typeof(string))
+                            )
+                            {
+                                // Vis kun navnet (første CN=)
+                                var memberStr = member.ToString();
+                                var cn = memberStr.StartsWith("CN=")
+                                    ? memberStr.Split(',')[0].Substring(3)
+                                    : memberStr;
+                                members.Add(cn);
+                            }
+                        }
+                        result[group] = members;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Fejl ved hentning af grupper/medlemmer: {ex.Message}");
+                }
+            }
+            return result;
+        }
     }
 
     public record Config(ADConfig AD, ADAdminConfig ADAdmin);
